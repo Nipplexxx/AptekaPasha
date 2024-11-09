@@ -58,9 +58,9 @@
             // 
             this.dataGridViewMedicine.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.dataGridViewMedicine.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewMedicine.Location = new System.Drawing.Point(237, 27);
+            this.dataGridViewMedicine.Location = new System.Drawing.Point(0, 27);
             this.dataGridViewMedicine.Name = "dataGridViewMedicine";
-            this.dataGridViewMedicine.Size = new System.Drawing.Size(240, 150);
+            this.dataGridViewMedicine.Size = new System.Drawing.Size(784, 261);
             this.dataGridViewMedicine.TabIndex = 0;
             // 
             // flowLayoutPanelButtons
@@ -170,7 +170,7 @@
             // 
             this.medicineToolStripMenuItem1.BackColor = System.Drawing.Color.Honeydew;
             this.medicineToolStripMenuItem1.Name = "medicineToolStripMenuItem1";
-            this.medicineToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.medicineToolStripMenuItem1.Size = new System.Drawing.Size(126, 22);
             this.medicineToolStripMenuItem1.Text = "Medicine";
             this.medicineToolStripMenuItem1.Click += new System.EventHandler(this.medicineToolStripMenuItem_Click);
             // 
@@ -178,7 +178,7 @@
             // 
             this.customerToolStripMenuItem.BackColor = System.Drawing.Color.Honeydew;
             this.customerToolStripMenuItem.Name = "customerToolStripMenuItem";
-            this.customerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.customerToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.customerToolStripMenuItem.Text = "Customer";
             this.customerToolStripMenuItem.Click += new System.EventHandler(this.customerToolStripMenuItem_Click);
             // 
@@ -186,7 +186,7 @@
             // 
             this.orderToolStripMenuItem.BackColor = System.Drawing.Color.Honeydew;
             this.orderToolStripMenuItem.Name = "orderToolStripMenuItem";
-            this.orderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.orderToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.orderToolStripMenuItem.Text = "Order";
             this.orderToolStripMenuItem.Click += new System.EventHandler(this.orderToolStripMenuItem_Click);
             // 
@@ -194,7 +194,7 @@
             // 
             this.orderItemToolStripMenuItem.BackColor = System.Drawing.Color.Honeydew;
             this.orderItemToolStripMenuItem.Name = "orderItemToolStripMenuItem";
-            this.orderItemToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.orderItemToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.orderItemToolStripMenuItem.Text = "OrderItem";
             this.orderItemToolStripMenuItem.Click += new System.EventHandler(this.orderItemToolStripMenuItem_Click);
             // 
@@ -202,7 +202,7 @@
             // 
             this.checkToolStripMenuItem.BackColor = System.Drawing.Color.Honeydew;
             this.checkToolStripMenuItem.Name = "checkToolStripMenuItem";
-            this.checkToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.checkToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.checkToolStripMenuItem.Text = "Check";
             this.checkToolStripMenuItem.Click += new System.EventHandler(this.CheckToolStripMenuItem_Click);
             // 
