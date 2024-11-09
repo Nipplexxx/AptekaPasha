@@ -11,6 +11,9 @@ namespace AptekaPasha
     {
         private readonly string connectionString = "Data Source=ACER;Initial Catalog=BD_apteka;Integrated Security=True;Encrypt=False";
         private string currentTableName;
+        private int currentPage = 1; // Текущая страница
+        private int totalPages = 1;  // Общее количество страниц
+        private const int recordsPerPage = 10; // Количество записей на странице
 
         public Medicine()
         {
@@ -36,44 +39,52 @@ namespace AptekaPasha
         {
             currentTableName = tableName;
             string query;
+            string countQuery;
 
             // Определение запроса в зависимости от таблицы
             if (tableName == "OrderTable")
             {
-                // JOIN для замены CustomerId на имя клиента
-                query = @"
-            SELECT o.Id, o.OrderDate, c.FirstName + ' ' + c.LastName AS CustomerName, o.TotalAmount
-            FROM OrderTable o
-            JOIN Customer c ON o.CustomerId = c.Id";
+                query = $@"
+                SELECT o.Id, o.OrderDate, c.FirstName + ' ' + c.LastName AS CustomerName, o.TotalAmount
+                FROM OrderTable o
+                JOIN Customer c ON o.CustomerId = c.Id
+                ORDER BY o.Id
+                OFFSET {(currentPage - 1) * recordsPerPage} ROWS FETCH NEXT {recordsPerPage} ROWS ONLY";
+
+                countQuery = "SELECT COUNT(*) FROM OrderTable";
             }
             else if (tableName == "OrderItem")
             {
-                // JOIN для замены MedicineId на название медикамента
-                query = @"
-            SELECT oi.Id, oi.OrderId, m.Name AS MedicineName, oi.Quantity, oi.UnitPrice
-            FROM OrderItem oi
-            JOIN Medicine m ON oi.MedicineId = m.Id";
+                query = $@"
+                SELECT oi.Id, oi.OrderId, m.Name AS MedicineName, oi.Quantity, oi.UnitPrice
+                FROM OrderItem oi
+                JOIN Medicine m ON oi.MedicineId = m.Id
+                ORDER BY oi.Id
+                OFFSET {(currentPage - 1) * recordsPerPage} ROWS FETCH NEXT {recordsPerPage} ROWS ONLY";
+
+                countQuery = "SELECT COUNT(*) FROM OrderItem";
             }
             else if (tableName == "Check")
             {
-                // Новый запрос для отображения данных чека
-                query = @"
-            SELECT 
-                c.FirstName + ' ' + c.LastName AS CustomerName,
-                m.Name AS MedicineName,
-                oi.Quantity,
-                o.OrderDate,
-                oi.UnitPrice,
-                (oi.Quantity * oi.UnitPrice) AS TotalPrice
-            FROM OrderTable o
-            JOIN Customer c ON o.CustomerId = c.Id
-            JOIN OrderItem oi ON o.Id = oi.OrderId
-            JOIN Medicine m ON oi.MedicineId = m.Id";
+                query = $@"
+                SELECT c.FirstName + ' ' + c.LastName AS CustomerName, m.Name AS MedicineName, oi.Quantity, o.OrderDate, oi.UnitPrice, (oi.Quantity * oi.UnitPrice) AS TotalPrice
+                FROM OrderTable o
+                JOIN Customer c ON o.CustomerId = c.Id
+                JOIN OrderItem oi ON o.Id = oi.OrderId
+                JOIN Medicine m ON oi.MedicineId = m.Id
+                ORDER BY o.Id
+                OFFSET {(currentPage - 1) * recordsPerPage} ROWS FETCH NEXT {recordsPerPage} ROWS ONLY";
+
+                countQuery = "SELECT COUNT(*) FROM OrderItem"; // Обновите это, если нужно получить общее количество для другого запроса
             }
             else
             {
-                // Для других таблиц - простой запрос
-                query = $"SELECT * FROM {tableName}";
+                query = $@"
+                SELECT * FROM {tableName}
+                ORDER BY Id
+                OFFSET {(currentPage - 1) * recordsPerPage} ROWS FETCH NEXT {recordsPerPage} ROWS ONLY";
+
+                countQuery = $"SELECT COUNT(*) FROM {tableName}";
             }
 
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -81,12 +92,19 @@ namespace AptekaPasha
                 try
                 {
                     connection.Open();
+
+                    // Получение общего количества записей
+                    SqlCommand countCommand = new SqlCommand(countQuery, connection);
+                    int totalRecords = (int)countCommand.ExecuteScalar();
+                    totalPages = (int)Math.Ceiling(totalRecords / (double)recordsPerPage);
+
+                    // Загрузка данных для текущей страницы
                     SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
                     DataTable dataTable = new DataTable();
                     adapter.Fill(dataTable);
                     dataGridViewMedicine.DataSource = dataTable;
 
-                    // скрытие колонки Id, если она существует
+                    // Скрытие колонки Id, если она существует
                     if (dataGridViewMedicine.Columns.Contains("Id"))
                     {
                         dataGridViewMedicine.Columns["Id"].Visible = false;
@@ -97,6 +115,33 @@ namespace AptekaPasha
                     MessageBox.Show("Ошибка при загрузке данных: " + ex.Message);
                 }
             }
+
+            UpdatePaginationControls();
+        }
+
+        private void UpdatePaginationControls()
+        {
+            btnPrevious.Enabled = currentPage > 1;
+            btnNext.Enabled = currentPage < totalPages;
+            lblPage.Text = $"Страница {currentPage} из {totalPages}";
+        }
+
+        private void btnPrevious_Click(object sender, EventArgs e)
+        {
+            if (currentPage > 1)
+            {
+                currentPage--;
+                LoadData(currentTableName);
+            }
+        }
+
+        private void btnNext_Click(object sender, EventArgs e)
+        {
+            if (currentPage < totalPages)
+            {
+                currentPage++;
+                LoadData(currentTableName);
+            }
         }
 
         // Добавление пункта меню для отображения чека
@@ -104,8 +149,6 @@ namespace AptekaPasha
         {
             LoadData("Check");
         }
-
-
 
         // Обработчики для пунктов меню
         private void medicineToolStripMenuItem_Click(object sender, EventArgs e)
@@ -128,6 +171,7 @@ namespace AptekaPasha
             LoadData("OrderItem");
         }
 
+        // Операции с данными (например, добавление, редактирование, удаление)
         private void ExecuteQuery(string query, SqlParameter[] parameters)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -214,6 +258,11 @@ namespace AptekaPasha
         private void btnLoadData_Click_1(object sender, EventArgs e)
         {
             LoadData(currentTableName);
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
