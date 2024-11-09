@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AptekaPasha
@@ -14,6 +10,8 @@ namespace AptekaPasha
     public partial class Medicine : Form
     {
         private readonly string connectionString = "Data Source=ACER;Initial Catalog=BD_apteka;Integrated Security=True;Encrypt=False";
+        private string currentTableName;
+
         public Medicine()
         {
             InitializeComponent();
@@ -22,17 +20,10 @@ namespace AptekaPasha
         private void Medicine_Load(object sender, EventArgs e)
         {
             this.Opacity = 1;
-            LoadMedicineData();  // загрузка данных
+            LoadData("Medicine");  // загрузка данных по умолчанию
 
             dataGridViewMedicine.Dock = DockStyle.Fill;
-
             dataGridViewMedicine.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            // вскрыл колонку Id
-            if (dataGridViewMedicine.Columns.Contains("Id"))
-            {
-                dataGridViewMedicine.Columns["Id"].Visible = false;
-            }
 
             flowLayoutPanelButtons.Dock = DockStyle.Bottom;
             flowLayoutPanelButtons.FlowDirection = FlowDirection.LeftToRight;
@@ -41,19 +32,65 @@ namespace AptekaPasha
             flowLayoutPanelButtons.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         }
 
-        // загрузка данных
-        private void LoadMedicineData()
+        private void LoadData(string tableName)
         {
+            currentTableName = tableName;
+            string query;
+
+            // Определение запроса в зависимости от таблицы
+            if (tableName == "OrderTable")
+            {
+                // JOIN для замены CustomerId на имя клиента
+                query = @"
+            SELECT o.Id, o.OrderDate, c.FirstName + ' ' + c.LastName AS CustomerName, o.TotalAmount
+            FROM OrderTable o
+            JOIN Customer c ON o.CustomerId = c.Id";
+            }
+            else if (tableName == "OrderItem")
+            {
+                // JOIN для замены MedicineId на название медикамента
+                query = @"
+            SELECT oi.Id, oi.OrderId, m.Name AS MedicineName, oi.Quantity, oi.UnitPrice
+            FROM OrderItem oi
+            JOIN Medicine m ON oi.MedicineId = m.Id";
+            }
+            else if (tableName == "Check")
+            {
+                // Новый запрос для отображения данных чека
+                query = @"
+            SELECT 
+                c.FirstName + ' ' + c.LastName AS CustomerName,
+                m.Name AS MedicineName,
+                oi.Quantity,
+                o.OrderDate,
+                oi.UnitPrice,
+                (oi.Quantity * oi.UnitPrice) AS TotalPrice
+            FROM OrderTable o
+            JOIN Customer c ON o.CustomerId = c.Id
+            JOIN OrderItem oi ON o.Id = oi.OrderId
+            JOIN Medicine m ON oi.MedicineId = m.Id";
+            }
+            else
+            {
+                // Для других таблиц - простой запрос
+                query = $"SELECT * FROM {tableName}";
+            }
+
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    string query = "SELECT * FROM Medicine";
                     SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
                     DataTable dataTable = new DataTable();
                     adapter.Fill(dataTable);
                     dataGridViewMedicine.DataSource = dataTable;
+
+                    // скрытие колонки Id, если она существует
+                    if (dataGridViewMedicine.Columns.Contains("Id"))
+                    {
+                        dataGridViewMedicine.Columns["Id"].Visible = false;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -62,128 +99,121 @@ namespace AptekaPasha
             }
         }
 
-        // добавление новой записи
-        private void btnAdd_Click_1(object sender, EventArgs e)
+        // Добавление пункта меню для отображения чека
+        private void CheckToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (dataGridViewMedicine.CurrentRow == null)
-            {
-                MessageBox.Show("Выберите запись для добавления.");
-                return;
-            }
+            LoadData("Check");
+        }
 
-            string name = Convert.ToString(dataGridViewMedicine.CurrentRow.Cells["Name"].Value);
-            string description = Convert.ToString(dataGridViewMedicine.CurrentRow.Cells["Description"].Value);
-            decimal price = Convert.ToDecimal(dataGridViewMedicine.CurrentRow.Cells["Price"].Value);
-            int stockQuantity = Convert.ToInt32(dataGridViewMedicine.CurrentRow.Cells["StockQuantity"].Value);
-            DateTime expiryDate = Convert.ToDateTime(dataGridViewMedicine.CurrentRow.Cells["ExpiryDate"].Value);
 
+
+        // Обработчики для пунктов меню
+        private void medicineToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadData("Medicine");
+        }
+
+        private void customerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadData("Customer");
+        }
+
+        private void orderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadData("OrderTable");
+        }
+
+        private void orderItemToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadData("OrderItem");
+        }
+
+        private void ExecuteQuery(string query, SqlParameter[] parameters)
+        {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Medicine (Name, Description, Price, StockQuantity, ExpiryDate) VALUES (@Name, @Description, @Price, @StockQuantity, @ExpiryDate)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@Name", name);
-                        command.Parameters.AddWithValue("@Description", description);
-                        command.Parameters.AddWithValue("@Price", price);
-                        command.Parameters.AddWithValue("@StockQuantity", stockQuantity);
-                        command.Parameters.AddWithValue("@ExpiryDate", expiryDate);
-
+                        if (parameters != null)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
                         command.ExecuteNonQuery();
                     }
-                    LoadMedicineData(); // перезагрузка
+                    LoadData(currentTableName); // перезагрузка данных
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Ошибка при добавлении записи: " + ex.Message);
+                    MessageBox.Show("Ошибка при выполнении операции: " + ex.Message);
                 }
             }
+        }
+
+        // добавление новой записи
+        private void btnAdd_Click_1(object sender, EventArgs e)
+        {
+            var columns = dataGridViewMedicine.Columns;
+            var values = new List<string>();
+            var parameters = new List<SqlParameter>();
+
+            for (int i = 1; i < columns.Count; i++) // Пропускаем Id
+            {
+                string columnName = columns[i].Name;
+                object value = dataGridViewMedicine.CurrentRow.Cells[columnName].Value;
+                values.Add($"@{columnName}");
+                parameters.Add(new SqlParameter($"@{columnName}", value ?? DBNull.Value));
+            }
+
+            string query = $"INSERT INTO {currentTableName} ({string.Join(", ", columns.Cast<DataGridViewColumn>().Skip(1).Select(c => c.Name))}) VALUES ({string.Join(", ", values)})";
+            ExecuteQuery(query, parameters.ToArray());
         }
 
         // редактирование записи
         private void btnEdit_Click_1(object sender, EventArgs e)
         {
-            if (dataGridViewMedicine.CurrentRow == null)
+            if (dataGridViewMedicine.CurrentRow == null || !dataGridViewMedicine.Columns.Contains("Id"))
             {
                 MessageBox.Show("Выберите запись для редактирования.");
                 return;
             }
 
             int id = Convert.ToInt32(dataGridViewMedicine.CurrentRow.Cells["Id"].Value);
-            string name = Convert.ToString(dataGridViewMedicine.CurrentRow.Cells["Name"].Value);
-            string description = Convert.ToString(dataGridViewMedicine.CurrentRow.Cells["Description"].Value);
-            decimal price = Convert.ToDecimal(dataGridViewMedicine.CurrentRow.Cells["Price"].Value);
-            int stockQuantity = Convert.ToInt32(dataGridViewMedicine.CurrentRow.Cells["StockQuantity"].Value);
-            DateTime expiryDate = Convert.ToDateTime(dataGridViewMedicine.CurrentRow.Cells["ExpiryDate"].Value);
+            var parameters = new List<SqlParameter> { new SqlParameter("@Id", id) };
+            var setClause = new List<string>();
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            for (int i = 1; i < dataGridViewMedicine.Columns.Count; i++) // Пропускаем Id
             {
-                try
-                {
-                    connection.Open();
-                    string query = "UPDATE Medicine SET Name = @Name, Description = @Description, Price = @Price, StockQuantity = @StockQuantity, ExpiryDate = @ExpiryDate WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        command.Parameters.AddWithValue("@Name", name);
-                        command.Parameters.AddWithValue("@Description", description);
-                        command.Parameters.AddWithValue("@Price", price);
-                        command.Parameters.AddWithValue("@StockQuantity", stockQuantity);
-                        command.Parameters.AddWithValue("@ExpiryDate", expiryDate);
-
-                        command.ExecuteNonQuery();
-                    }
-                    LoadMedicineData(); // нужно больше перезагрузок
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Ошибка при редактировании записи: " + ex.Message);
-                }
+                string columnName = dataGridViewMedicine.Columns[i].Name;
+                object value = dataGridViewMedicine.CurrentRow.Cells[columnName].Value;
+                setClause.Add($"{columnName} = @{columnName}");
+                parameters.Add(new SqlParameter($"@{columnName}", value ?? DBNull.Value));
             }
+
+            string query = $"UPDATE {currentTableName} SET {string.Join(", ", setClause)} WHERE Id = @Id";
+            ExecuteQuery(query, parameters.ToArray());
         }
 
         // удаление записи
         private void btnDelete_Click_1(object sender, EventArgs e)
         {
-            if (dataGridViewMedicine.CurrentRow == null)
+            if (dataGridViewMedicine.CurrentRow == null || !dataGridViewMedicine.Columns.Contains("Id"))
             {
                 MessageBox.Show("Выберите запись для удаления.");
                 return;
             }
 
             int id = Convert.ToInt32(dataGridViewMedicine.CurrentRow.Cells["Id"].Value);
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "DELETE FROM Medicine WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        command.ExecuteNonQuery();
-                    }
-                    LoadMedicineData();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Ошибка при удалении записи: " + ex.Message);
-                }
-            }
+            string query = $"DELETE FROM {currentTableName} WHERE Id = @Id";
+            ExecuteQuery(query, new SqlParameter[] { new SqlParameter("@Id", id) });
         }
 
         // обновление данных
         private void btnLoadData_Click_1(object sender, EventArgs e)
         {
-            LoadMedicineData();
-        }
-
-        private void medicineToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
+            LoadData(currentTableName);
         }
     }
 }

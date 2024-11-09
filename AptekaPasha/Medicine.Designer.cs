@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Medicine));
             this.dataGridViewMedicine = new System.Windows.Forms.DataGridView();
             this.flowLayoutPanelButtons = new System.Windows.Forms.FlowLayoutPanel();
             this.btnAdd = new System.Windows.Forms.Button();
@@ -41,6 +42,7 @@
             this.customerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.orderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.orderItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMedicine)).BeginInit();
             this.flowLayoutPanelButtons.SuspendLayout();
             this.MenuStrip.SuspendLayout();
@@ -48,68 +50,87 @@
             // 
             // dataGridViewMedicine
             // 
+            this.dataGridViewMedicine.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.dataGridViewMedicine.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewMedicine.Location = new System.Drawing.Point(254, 0);
+            this.dataGridViewMedicine.Location = new System.Drawing.Point(237, 27);
             this.dataGridViewMedicine.Name = "dataGridViewMedicine";
             this.dataGridViewMedicine.Size = new System.Drawing.Size(240, 150);
             this.dataGridViewMedicine.TabIndex = 0;
             // 
             // flowLayoutPanelButtons
             // 
+            this.flowLayoutPanelButtons.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.flowLayoutPanelButtons.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.flowLayoutPanelButtons.Controls.Add(this.btnAdd);
             this.flowLayoutPanelButtons.Controls.Add(this.btnEdit);
             this.flowLayoutPanelButtons.Controls.Add(this.btnDelete);
             this.flowLayoutPanelButtons.Controls.Add(this.btnLoadData);
-            this.flowLayoutPanelButtons.Location = new System.Drawing.Point(215, 418);
+            this.flowLayoutPanelButtons.Location = new System.Drawing.Point(237, 418);
+            this.flowLayoutPanelButtons.MaximumSize = new System.Drawing.Size(325, 30);
+            this.flowLayoutPanelButtons.MinimumSize = new System.Drawing.Size(325, 30);
             this.flowLayoutPanelButtons.Name = "flowLayoutPanelButtons";
-            this.flowLayoutPanelButtons.Size = new System.Drawing.Size(325, 31);
+            this.flowLayoutPanelButtons.Size = new System.Drawing.Size(325, 30);
             this.flowLayoutPanelButtons.TabIndex = 1;
             // 
             // btnAdd
             // 
+            this.btnAdd.BackColor = System.Drawing.Color.Honeydew;
+            this.btnAdd.Font = new System.Drawing.Font("GOST Common", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnAdd.ForeColor = System.Drawing.SystemColors.WindowText;
             this.btnAdd.Location = new System.Drawing.Point(3, 3);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(75, 23);
             this.btnAdd.TabIndex = 0;
             this.btnAdd.Text = "Add";
-            this.btnAdd.UseVisualStyleBackColor = true;
+            this.btnAdd.UseVisualStyleBackColor = false;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click_1);
             // 
             // btnEdit
             // 
+            this.btnEdit.BackColor = System.Drawing.Color.Honeydew;
+            this.btnEdit.Font = new System.Drawing.Font("GOST Common", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnEdit.ForeColor = System.Drawing.SystemColors.WindowText;
             this.btnEdit.Location = new System.Drawing.Point(84, 3);
             this.btnEdit.Name = "btnEdit";
             this.btnEdit.Size = new System.Drawing.Size(75, 23);
             this.btnEdit.TabIndex = 1;
             this.btnEdit.Text = "Edit";
-            this.btnEdit.UseVisualStyleBackColor = true;
+            this.btnEdit.UseVisualStyleBackColor = false;
             this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click_1);
             // 
             // btnDelete
             // 
+            this.btnDelete.BackColor = System.Drawing.Color.Honeydew;
+            this.btnDelete.Font = new System.Drawing.Font("GOST Common", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnDelete.ForeColor = System.Drawing.SystemColors.WindowText;
             this.btnDelete.Location = new System.Drawing.Point(165, 3);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(75, 23);
             this.btnDelete.TabIndex = 2;
             this.btnDelete.Text = "Delete";
-            this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.UseVisualStyleBackColor = false;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click_1);
             // 
             // btnLoadData
             // 
+            this.btnLoadData.BackColor = System.Drawing.Color.Honeydew;
+            this.btnLoadData.Font = new System.Drawing.Font("GOST Common", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnLoadData.ForeColor = System.Drawing.SystemColors.WindowText;
             this.btnLoadData.Location = new System.Drawing.Point(246, 3);
             this.btnLoadData.Name = "btnLoadData";
             this.btnLoadData.Size = new System.Drawing.Size(75, 23);
             this.btnLoadData.TabIndex = 3;
             this.btnLoadData.Text = "Load Data";
-            this.btnLoadData.UseVisualStyleBackColor = true;
+            this.btnLoadData.UseVisualStyleBackColor = false;
             this.btnLoadData.Click += new System.EventHandler(this.btnLoadData_Click_1);
             // 
             // MenuStrip
             // 
             this.MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuToolStripMenuItem,
-            this.medicineToolStripMenuItem});
+            this.medicineToolStripMenuItem,
+            this.menuToolStripMenuItem});
             this.MenuStrip.Location = new System.Drawing.Point(0, 0);
             this.MenuStrip.Name = "MenuStrip";
             this.MenuStrip.Size = new System.Drawing.Size(784, 24);
@@ -118,54 +139,77 @@
             // 
             // medicineToolStripMenuItem
             // 
+            this.medicineToolStripMenuItem.BackColor = System.Drawing.Color.Honeydew;
+            this.medicineToolStripMenuItem.Font = new System.Drawing.Font("GOST Common", 9F);
             this.medicineToolStripMenuItem.Name = "medicineToolStripMenuItem";
-            this.medicineToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
+            this.medicineToolStripMenuItem.Size = new System.Drawing.Size(62, 20);
             this.medicineToolStripMenuItem.Text = "Medicine";
             this.medicineToolStripMenuItem.Click += new System.EventHandler(this.medicineToolStripMenuItem_Click);
             // 
             // menuToolStripMenuItem
             // 
+            this.menuToolStripMenuItem.BackColor = System.Drawing.Color.Honeydew;
             this.menuToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.medicineToolStripMenuItem1,
             this.customerToolStripMenuItem,
             this.orderToolStripMenuItem,
-            this.orderItemToolStripMenuItem});
+            this.orderItemToolStripMenuItem,
+            this.checkToolStripMenuItem});
+            this.menuToolStripMenuItem.Font = new System.Drawing.Font("GOST Common", 9F);
             this.menuToolStripMenuItem.Name = "menuToolStripMenuItem";
-            this.menuToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
+            this.menuToolStripMenuItem.Size = new System.Drawing.Size(45, 20);
             this.menuToolStripMenuItem.Text = "Menu";
             // 
             // medicineToolStripMenuItem1
             // 
+            this.medicineToolStripMenuItem1.BackColor = System.Drawing.Color.Honeydew;
             this.medicineToolStripMenuItem1.Name = "medicineToolStripMenuItem1";
             this.medicineToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.medicineToolStripMenuItem1.Text = "Medicine";
+            this.medicineToolStripMenuItem1.Click += new System.EventHandler(this.medicineToolStripMenuItem_Click);
             // 
             // customerToolStripMenuItem
             // 
+            this.customerToolStripMenuItem.BackColor = System.Drawing.Color.Honeydew;
             this.customerToolStripMenuItem.Name = "customerToolStripMenuItem";
             this.customerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.customerToolStripMenuItem.Text = "Customer";
+            this.customerToolStripMenuItem.Click += new System.EventHandler(this.customerToolStripMenuItem_Click);
             // 
             // orderToolStripMenuItem
             // 
+            this.orderToolStripMenuItem.BackColor = System.Drawing.Color.Honeydew;
             this.orderToolStripMenuItem.Name = "orderToolStripMenuItem";
             this.orderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.orderToolStripMenuItem.Text = "Order";
+            this.orderToolStripMenuItem.Click += new System.EventHandler(this.orderToolStripMenuItem_Click);
             // 
             // orderItemToolStripMenuItem
             // 
+            this.orderItemToolStripMenuItem.BackColor = System.Drawing.Color.Honeydew;
             this.orderItemToolStripMenuItem.Name = "orderItemToolStripMenuItem";
             this.orderItemToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.orderItemToolStripMenuItem.Text = "OrderItem";
+            this.orderItemToolStripMenuItem.Click += new System.EventHandler(this.orderItemToolStripMenuItem_Click);
+            // 
+            // checkToolStripMenuItem
+            // 
+            this.checkToolStripMenuItem.BackColor = System.Drawing.Color.Honeydew;
+            this.checkToolStripMenuItem.Name = "checkToolStripMenuItem";
+            this.checkToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.checkToolStripMenuItem.Text = "Check";
+            this.checkToolStripMenuItem.Click += new System.EventHandler(this.CheckToolStripMenuItem_Click);
             // 
             // Medicine
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.Honeydew;
             this.ClientSize = new System.Drawing.Size(784, 461);
             this.Controls.Add(this.flowLayoutPanelButtons);
             this.Controls.Add(this.dataGridViewMedicine);
             this.Controls.Add(this.MenuStrip);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuStrip;
             this.MinimumSize = new System.Drawing.Size(800, 500);
             this.Name = "Medicine";
@@ -195,5 +239,6 @@
         private System.Windows.Forms.ToolStripMenuItem customerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem orderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem orderItemToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem checkToolStripMenuItem;
     }
 }
