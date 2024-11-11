@@ -112,7 +112,7 @@ namespace AptekaPasha
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Ошибка при загрузке данных: " + ex.Message);
+                    MessageBox.Show("Error loading data: " + ex.Message);
                 }
             }
 
@@ -123,7 +123,7 @@ namespace AptekaPasha
         {
             btnPrevious.Enabled = currentPage > 1;
             btnNext.Enabled = currentPage < totalPages;
-            lblPage.Text = $"Страница {currentPage} из {totalPages}";
+            lblPage.Text = $"Page {currentPage} from {totalPages}";
         }
 
         private void btnPrevious_Click(object sender, EventArgs e)
@@ -191,7 +191,7 @@ namespace AptekaPasha
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Ошибка при выполнении операции: " + ex.Message);
+                    MessageBox.Show("Error while performing the operation: " + ex.Message);
                 }
             }
         }
@@ -220,7 +220,7 @@ namespace AptekaPasha
         {
             if (dataGridViewMedicine.CurrentRow == null || !dataGridViewMedicine.Columns.Contains("Id"))
             {
-                MessageBox.Show("Выберите запись для редактирования.");
+                MessageBox.Show("Select the entry to edit.");
                 return;
             }
 
@@ -245,7 +245,7 @@ namespace AptekaPasha
         {
             if (dataGridViewMedicine.CurrentRow == null || !dataGridViewMedicine.Columns.Contains("Id"))
             {
-                MessageBox.Show("Выберите запись для удаления.");
+                MessageBox.Show("Select the record to delete.");
                 return;
             }
 
@@ -325,12 +325,12 @@ namespace AptekaPasha
                         }
 
                         transaction.Commit();
-                        MessageBox.Show("Заказ успешно оформлен!");
+                        MessageBox.Show("The order has been successfully placed!");
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Ошибка при оформлении заказа: " + ex.Message);
+                    MessageBox.Show("Error when placing an order: " + ex.Message);
                 }
             }
         }

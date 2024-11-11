@@ -130,6 +130,7 @@
             this.btnNext.TabIndex = 2;
             this.btnNext.Text = "Next";
             this.btnNext.UseVisualStyleBackColor = false;
+            this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
             // 
             // tableLayoutPanel1
             // 
@@ -161,6 +162,7 @@
             this.btnPrevious.TabIndex = 0;
             this.btnPrevious.Text = "Previous ";
             this.btnPrevious.UseVisualStyleBackColor = false;
+            this.btnPrevious.Click += new System.EventHandler(this.btnPrevious_Click);
             // 
             // lblPage
             // 

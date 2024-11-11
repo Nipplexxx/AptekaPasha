@@ -50,8 +50,8 @@ namespace AptekaPasha
 
                 if (!dataGridViewMedicines.Columns.Contains("Select"))
                 {
-                    dataGridViewMedicines.Columns.Insert(0, new DataGridViewCheckBoxColumn { Name = "Select", HeaderText = "Выбрать" });
-                    dataGridViewMedicines.Columns.Add(new DataGridViewTextBoxColumn { Name = "Quantity", HeaderText = "Количество" });
+                    dataGridViewMedicines.Columns.Insert(0, new DataGridViewCheckBoxColumn { Name = "Select", HeaderText = "Choose" });
+                    dataGridViewMedicines.Columns.Add(new DataGridViewTextBoxColumn { Name = "Quantity", HeaderText = "Quantity" });
                 }
 
                 UpdatePaginationControls();
@@ -62,7 +62,7 @@ namespace AptekaPasha
         {
             btnPrevious.Enabled = currentPage > 1;
             btnNext.Enabled = currentPage < totalPages;
-            lblPage.Text = $"Страница {currentPage} из {totalPages}";
+            lblPage.Text = $"Page {currentPage} from {totalPages}";
         }
 
         private void btnPrevious_Click(object sender, EventArgs e)
@@ -93,7 +93,7 @@ namespace AptekaPasha
 
             if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(phone) || string.IsNullOrWhiteSpace(email))
             {
-                MessageBox.Show("Пожалуйста, заполните все данные клиента.");
+                MessageBox.Show("Please fill in all customer details.");
                 return;
             }
 
@@ -114,7 +114,7 @@ namespace AptekaPasha
 
                     if (quantity > stock)
                     {
-                        MessageBox.Show($"Недостаточно товара {row.Cells["Name"].Value} на складе.");
+                        MessageBox.Show($"There is not enough product {row.Cells["Name"].Value} in the warehouse.");
                         return;
                     }
 
@@ -125,15 +125,20 @@ namespace AptekaPasha
 
             if (!SelectedItems.Any())
             {
-                MessageBox.Show("Выберите хотя бы один товар.");
+                MessageBox.Show("Select at least one product.");
                 return;
             }
 
-            ProcessOrder(totalAmount);
-            MessageBox.Show($"Заказ успешно оформлен! Итоговая сумма: {totalAmount:C}");
-
-            DialogResult = DialogResult.OK;
-            Close();
+            if (ProcessOrder(totalAmount))
+            {
+                MessageBox.Show($"The order has been successfully placed! The total amount: {totalAmount:C}");
+                DialogResult = DialogResult.OK;
+                Close();
+            }
+            else
+            {
+                DialogResult = DialogResult.None;
+            }
         }
 
         private int AddCustomer(string firstName, string lastName, DateTime birthDate, string phone, string email)
@@ -158,13 +163,13 @@ namespace AptekaPasha
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Ошибка при добавлении клиента: " + ex.Message);
+                    MessageBox.Show("Error when adding a client: " + ex.Message);
                     return -1;
                 }
             }
         }
 
-        private void ProcessOrder(decimal totalAmount)
+        private bool ProcessOrder(decimal totalAmount)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -185,37 +190,46 @@ namespace AptekaPasha
                         orderId = (int)orderCommand.ExecuteScalar();
                     }
 
+                    HashSet<int> processedMedicines = new HashSet<int>();
+
                     foreach (var item in SelectedItems)
                     {
                         int medicineId = item.Item1;
                         int quantity = item.Item2;
                         decimal unitPrice = item.Item3;
 
-                        string updateStockQuery = "UPDATE Medicine SET StockQuantity = StockQuantity - @Quantity WHERE Id = @Id";
-                        using (SqlCommand updateCommand = new SqlCommand(updateStockQuery, connection, transaction))
+                        if (!processedMedicines.Contains(medicineId))
                         {
-                            updateCommand.Parameters.AddWithValue("@Quantity", quantity);
-                            updateCommand.Parameters.AddWithValue("@Id", medicineId);
-                            updateCommand.ExecuteNonQuery();
-                        }
+                            processedMedicines.Add(medicineId);
 
-                        string insertOrderItemQuery = "INSERT INTO OrderItem (OrderId, MedicineId, Quantity, UnitPrice) VALUES (@OrderId, @MedicineId, @Quantity, @UnitPrice)";
-                        using (SqlCommand itemCommand = new SqlCommand(insertOrderItemQuery, connection, transaction))
-                        {
-                            itemCommand.Parameters.AddWithValue("@OrderId", orderId);
-                            itemCommand.Parameters.AddWithValue("@MedicineId", medicineId);
-                            itemCommand.Parameters.AddWithValue("@Quantity", quantity);
-                            itemCommand.Parameters.AddWithValue("@UnitPrice", unitPrice);
-                            itemCommand.ExecuteNonQuery();
+                            string updateStockQuery = "UPDATE Medicine SET StockQuantity = StockQuantity - @Quantity WHERE Id = @Id";
+                            using (SqlCommand updateCommand = new SqlCommand(updateStockQuery, connection, transaction))
+                            {
+                                updateCommand.Parameters.AddWithValue("@Quantity", quantity);
+                                updateCommand.Parameters.AddWithValue("@Id", medicineId);
+                                updateCommand.ExecuteNonQuery();
+                            }
+
+                            string insertOrderItemQuery = "INSERT INTO OrderItem (OrderId, MedicineId, Quantity, UnitPrice) VALUES (@OrderId, @MedicineId, @Quantity, @UnitPrice)";
+                            using (SqlCommand itemCommand = new SqlCommand(insertOrderItemQuery, connection, transaction))
+                            {
+                                itemCommand.Parameters.AddWithValue("@OrderId", orderId);
+                                itemCommand.Parameters.AddWithValue("@MedicineId", medicineId);
+                                itemCommand.Parameters.AddWithValue("@Quantity", quantity);
+                                itemCommand.Parameters.AddWithValue("@UnitPrice", unitPrice);
+                                itemCommand.ExecuteNonQuery();
+                            }
                         }
                     }
 
                     transaction.Commit();
+                    return true;
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
-                    MessageBox.Show("Ошибка при оформлении заказа: " + ex.Message);
+                    MessageBox.Show("Error when placing an order: " + ex.Message);
+                    return false;
                 }
             }
         }
