@@ -48,6 +48,7 @@
             this.btnNext = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
+            this.btnPlaceOrder = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMedicine)).BeginInit();
             this.flowLayoutPanelButtons.SuspendLayout();
             this.MenuStrip.SuspendLayout();
@@ -275,22 +276,39 @@
             this.label1.Text = "Version: 1.0.0.";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
+            // btnPlaceOrder
+            // 
+            this.btnPlaceOrder.BackColor = System.Drawing.Color.Honeydew;
+            this.btnPlaceOrder.Font = new System.Drawing.Font("GOST Common", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnPlaceOrder.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.btnPlaceOrder.Location = new System.Drawing.Point(15, 309);
+            this.btnPlaceOrder.Name = "btnPlaceOrder";
+            this.btnPlaceOrder.Size = new System.Drawing.Size(75, 23);
+            this.btnPlaceOrder.TabIndex = 6;
+            this.btnPlaceOrder.Text = "Order";
+            this.btnPlaceOrder.UseVisualStyleBackColor = false;
+            this.btnPlaceOrder.Click += new System.EventHandler(this.btnPlaceOrder_Click);
+            // 
             // Medicine
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Honeydew;
             this.ClientSize = new System.Drawing.Size(784, 461);
+            this.Controls.Add(this.btnPlaceOrder);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.flowLayoutPanelButtons);
             this.Controls.Add(this.dataGridViewMedicine);
             this.Controls.Add(this.MenuStrip);
+            this.Font = new System.Drawing.Font("GOST Common", 8.25F);
+            this.ForeColor = System.Drawing.SystemColors.WindowText;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuStrip;
             this.MinimumSize = new System.Drawing.Size(800, 500);
             this.Name = "Medicine";
-            this.Text = "Medicine";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Main";
             this.Load += new System.EventHandler(this.Medicine_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewMedicine)).EndInit();
             this.flowLayoutPanelButtons.ResumeLayout(false);
@@ -324,5 +342,6 @@
         private System.Windows.Forms.Button btnNext;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button btnPlaceOrder;
     }
 }

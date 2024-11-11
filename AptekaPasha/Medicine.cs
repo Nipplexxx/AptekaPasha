@@ -264,5 +264,75 @@ namespace AptekaPasha
         {
 
         }
+
+        private void btnPlaceOrder_Click(object sender, EventArgs e)
+        {
+            using (OrderForm orderForm = new OrderForm())
+            {
+                if (orderForm.ShowDialog() == DialogResult.OK)
+                {
+                    int customerId = orderForm.CustomerId;
+                    List<Tuple<int, int, decimal>> selectedItems = orderForm.SelectedItems;
+
+                    AddOrder(customerId, selectedItems);
+                }
+            }
+        }
+
+        private void AddOrder(int customerId, List<Tuple<int, int, decimal>> items)
+        {
+            string orderQuery = "INSERT INTO OrderTable (CustomerId, OrderDate, TotalAmount) " +
+                                "OUTPUT INSERTED.Id VALUES (@CustomerId, @OrderDate, @TotalAmount)";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    using (SqlTransaction transaction = connection.BeginTransaction())
+                    {
+                        SqlCommand orderCommand = new SqlCommand(orderQuery, connection, transaction);
+                        orderCommand.Parameters.AddWithValue("@CustomerId", customerId);
+                        orderCommand.Parameters.AddWithValue("@OrderDate", DateTime.Now);
+
+                        decimal totalAmount = 0;
+                        foreach (var item in items)
+                        {
+                            int medicineId = item.Item1;
+                            int quantity = item.Item2;
+                            decimal unitPrice = item.Item3;
+
+                            totalAmount += unitPrice * quantity;
+                        }
+
+                        orderCommand.Parameters.AddWithValue("@TotalAmount", totalAmount);
+                        int orderId = (int)orderCommand.ExecuteScalar();
+
+                        foreach (var item in items)
+                        {
+                            int medicineId = item.Item1;
+                            int quantity = item.Item2;
+                            decimal unitPrice = item.Item3;
+
+                            SqlCommand orderItemCommand = new SqlCommand("INSERT INTO OrderItem (OrderId, MedicineId, Quantity, UnitPrice) VALUES (@OrderId, @MedicineId, @Quantity, @UnitPrice)", connection, transaction);
+                            orderItemCommand.Parameters.AddWithValue("@OrderId", orderId);
+                            orderItemCommand.Parameters.AddWithValue("@MedicineId", medicineId);
+                            orderItemCommand.Parameters.AddWithValue("@Quantity", quantity);
+                            orderItemCommand.Parameters.AddWithValue("@UnitPrice", unitPrice);
+
+                            orderItemCommand.ExecuteNonQuery();
+                        }
+
+                        transaction.Commit();
+                        MessageBox.Show("Заказ успешно оформлен!");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка при оформлении заказа: " + ex.Message);
+                }
+            }
+        }
     }
 }
