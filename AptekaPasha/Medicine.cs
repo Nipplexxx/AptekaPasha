@@ -292,6 +292,21 @@ namespace AptekaPasha
 
                     using (SqlTransaction transaction = connection.BeginTransaction())
                     {
+                        // Проверка на существование заказа для клиента (например, по дате)
+                        string checkOrderQuery = "SELECT COUNT(*) FROM OrderTable WHERE CustomerId = @CustomerId AND OrderDate = @OrderDate";
+                        SqlCommand checkOrderCommand = new SqlCommand(checkOrderQuery, connection, transaction);
+                        checkOrderCommand.Parameters.AddWithValue("@CustomerId", customerId);
+                        checkOrderCommand.Parameters.AddWithValue("@OrderDate", DateTime.Now.Date); // Проверка только по дате (можно уточнить)
+
+                        int existingOrders = (int)checkOrderCommand.ExecuteScalar();
+
+                        if (existingOrders > 0)
+                        {
+                            MessageBox.Show("Заказ для данного клиента уже существует на сегодня.");
+                            return; // Не создаем заказ
+                        }
+
+                        // Создаем новый заказ
                         SqlCommand orderCommand = new SqlCommand(orderQuery, connection, transaction);
                         orderCommand.Parameters.AddWithValue("@CustomerId", customerId);
                         orderCommand.Parameters.AddWithValue("@OrderDate", DateTime.Now);
@@ -315,6 +330,21 @@ namespace AptekaPasha
                             int quantity = item.Item2;
                             decimal unitPrice = item.Item3;
 
+                            // Проверка на существование товара в заказе
+                            string checkOrderItemQuery = "SELECT COUNT(*) FROM OrderItem WHERE OrderId = @OrderId AND MedicineId = @MedicineId";
+                            SqlCommand checkOrderItemCommand = new SqlCommand(checkOrderItemQuery, connection, transaction);
+                            checkOrderItemCommand.Parameters.AddWithValue("@OrderId", orderId);
+                            checkOrderItemCommand.Parameters.AddWithValue("@MedicineId", medicineId);
+
+                            int existingOrderItems = (int)checkOrderItemCommand.ExecuteScalar();
+
+                            if (existingOrderItems > 0)
+                            {
+                                MessageBox.Show($"Product {medicineId} has already been added to this order.");
+                                continue; // Пропустить этот товар, если он уже есть в заказе
+                            }
+
+                            // Добавляем товар в заказ
                             SqlCommand orderItemCommand = new SqlCommand("INSERT INTO OrderItem (OrderId, MedicineId, Quantity, UnitPrice) VALUES (@OrderId, @MedicineId, @Quantity, @UnitPrice)", connection, transaction);
                             orderItemCommand.Parameters.AddWithValue("@OrderId", orderId);
                             orderItemCommand.Parameters.AddWithValue("@MedicineId", medicineId);
